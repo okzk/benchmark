@@ -11,7 +11,7 @@ import (
 )
 
 func (r Results) Save(file string) error {
-	b, err := json.Marshal(r)
+	b, err := r.ToJson()
 	if err != nil {
 		return err
 	}
@@ -19,14 +19,21 @@ func (r Results) Save(file string) error {
 	return ioutil.WriteFile(file, b, 0644)
 }
 
-func LoadResultsFromFile(file string) (r Results, err error) {
+func (r Results) ToJson() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func CreateResultsFromJson(buf []byte) (r Results, err error) {
+	err = json.Unmarshal(buf, &r)
+	return
+}
+
+func LoadResultsFromFile(file string) (Results, error) {
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
-		return
+		return nil, err
 	}
-
-	err = json.Unmarshal(b, &r)
-	return
+	return CreateResultsFromJson(b)
 }
 
 func (r Results) GroupByStatus() map[Status]Results {
@@ -48,9 +55,16 @@ func (r Results) GroupByStatus() map[Status]Results {
 }
 
 func (r Results) GroupByInfo(key string) map[string]Results {
+	return r.GroupBy(func(p *Result) string {
+		return p.Info[key]
+	})
+}
+
+func (r Results) GroupBy(grouping func(*Result) string) map[string]Results {
 	counter := make(map[string]int)
 	for _, v := range r {
-		counter[v.Info[key]] += 1
+		k := grouping(&v)
+		counter[k] += 1
 	}
 
 	ret := make(map[string]Results)
@@ -59,7 +73,8 @@ func (r Results) GroupByInfo(key string) map[string]Results {
 	}
 
 	for _, v := range r {
-		ret[v.Info[key]] = append(ret[v.Info[key]], v)
+		k := grouping(&v)
+		ret[k] = append(ret[k], v)
 	}
 
 	return ret
