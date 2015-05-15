@@ -11,11 +11,11 @@ import (
 func TestReadWriteFile(t *testing.T) {
 	now := time.Now().UnixNano()
 	results := Results{
-		Result{Status: 0, Start: now, End: now + 1, Info: "a"},
-		Result{Status: 1, Start: now, End: now + 2, Info: "b"},
-		Result{Status: 0, Start: now, End: now + 3, Info: "a"},
-		Result{Status: 1, Start: now, End: now + 4, Info: "b"},
-		Result{Status: 0, Start: now, End: now + 5, Info: "a"},
+		Result{Status: 0, Start: now, End: now + 1, Info: map[string]string{"i": "a"}},
+		Result{Status: 1, Start: now, End: now + 2, Info: nil},
+		Result{Status: 0, Start: now, End: now + 3, Info: map[string]string{"i": "b"}},
+		Result{Status: 1, Start: now, End: now + 4, Info: map[string]string{"i": "c", "aa": ""}},
+		Result{Status: 0, Start: now, End: now + 5, Info: nil},
 	}
 
 	file, _ := ioutil.TempFile(os.TempDir(), "bench_")
@@ -55,13 +55,13 @@ func TestGroupingByInfo(t *testing.T) {
 	now := time.Now().UnixNano()
 
 	results := Results{
-		Result{Status: 0, Start: now, End: now + 1, Info: "a"},
-		Result{Status: 1, Start: now, End: now + 2, Info: "b"},
-		Result{Status: 0, Start: now, End: now + 3, Info: "a"},
-		Result{Status: 1, Start: now, End: now + 4, Info: "b"},
-		Result{Status: 0, Start: now, End: now + 5, Info: "a"},
+		Result{Status: 0, Start: now, End: now + 1, Info: map[string]string{"i": "a"}},
+		Result{Status: 1, Start: now, End: now + 2, Info: map[string]string{"i": "b"}},
+		Result{Status: 0, Start: now, End: now + 3, Info: map[string]string{"i": "a"}},
+		Result{Status: 1, Start: now, End: now + 4, Info: map[string]string{"i": "b"}},
+		Result{Status: 0, Start: now, End: now + 5, Info: map[string]string{"i": "a"}},
 	}
-	ret := results.GroupByInfo()
+	ret := results.GroupByInfo("i")
 
 	if !reflect.DeepEqual(ret["a"], Results{results[0], results[2], results[4]}) {
 		t.Error("slice: %v", ret["a"])

@@ -12,9 +12,9 @@ func TestBenchRun(_ *testing.T) {
 		return
 	}
 
-	f := func(_ int, _ UserData) (int, string) {
+	f := func(_ int, _ UserData) (Status, OptionalInfo) {
 		time.Sleep(time.Duration(rand.Int63n(100 * 1000 * 1000)))
-		return rand.Intn(2), "sleep test"
+		return Status(rand.Intn(2)), nil
 	}
 	bench := Benchmark{Samples: 500, Concurrency: 50, TestFunc: f}
 	r := bench.Run()

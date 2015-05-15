@@ -26,13 +26,13 @@ func main() {
 	}
 	url := flag.Arg(0)
 
-	f := func(_ int, _ benchmark.UserData) (int, string) {
+	f := func(_ int, _ benchmark.UserData) (benchmark.Status, benchmark.OptionalInfo) {
 		res, err := http.Get(url)
 		if err != nil {
-			return 0, url
+			return 0, nil
 		}
 		res.Body.Close()
-		return res.StatusCode, url
+		return benchmark.Status(res.StatusCode), nil
 	}
 
 	b := &benchmark.Benchmark{Samples: samples, Concurrency: concurrency, TestFunc: f}

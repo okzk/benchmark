@@ -29,13 +29,13 @@ func LoadResultsFromFile(file string) (r Results, err error) {
 	return
 }
 
-func (r Results) GroupByStatus() map[int]Results {
-	counter := make(map[int]int)
+func (r Results) GroupByStatus() map[Status]Results {
+	counter := make(map[Status]int)
 	for _, v := range r {
 		counter[v.Status] += 1
 	}
 
-	ret := make(map[int]Results)
+	ret := make(map[Status]Results)
 	for k, v := range counter {
 		ret[k] = make(Results, 0, v)
 	}
@@ -47,10 +47,10 @@ func (r Results) GroupByStatus() map[int]Results {
 	return ret
 }
 
-func (r Results) GroupByInfo() map[string]Results {
+func (r Results) GroupByInfo(key string) map[string]Results {
 	counter := make(map[string]int)
 	for _, v := range r {
-		counter[v.Info] += 1
+		counter[v.Info[key]] += 1
 	}
 
 	ret := make(map[string]Results)
@@ -59,7 +59,7 @@ func (r Results) GroupByInfo() map[string]Results {
 	}
 
 	for _, v := range r {
-		ret[v.Info] = append(ret[v.Info], v)
+		ret[v.Info[key]] = append(ret[v.Info[key]], v)
 	}
 
 	return ret

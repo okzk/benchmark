@@ -6,20 +6,22 @@ import (
 )
 
 type UserData interface{}
+type Status int
+type OptionalInfo map[string]string
 
 type Benchmark struct {
 	Samples          int
 	Concurrency      int
-	TestFunc         func(int, UserData) (int, string)
+	TestFunc         func(int, UserData) (Status, OptionalInfo)
 	UserDataFactory  func() UserData
 	UserDataDisposer func(UserData)
 }
 
 type Result struct {
-	Status int
+	Status Status
 	Start  int64
 	End    int64
-	Info   string
+	Info   OptionalInfo
 }
 
 type Results []Result
